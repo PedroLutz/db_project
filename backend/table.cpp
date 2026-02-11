@@ -14,12 +14,13 @@ Table::ValidationResult Table::validateRow (const std::vector<Cell>& data) const
     return std::nullopt;
 }
 
-void Table::createColumn(const std::string &col_name, const TypeTag type){
-    if(col_name_to_index.count(col_name))
+void Table::createColumn(const Column& column){
+    std::unique_lock lock(rw_lock);
+    if(col_name_to_index.count(column.name))
         throw std::invalid_argument("Column already exists!");
     
-    cols.push_back({col_name, type}); //insert column definition
-    col_name_to_index[col_name] = cols.size() - 1; //insert column index
+    cols.push_back({column.name, column.type}); //insert column definition
+    col_name_to_index[column.name] = cols.size() - 1; //insert column index
 
     for(auto& row : rows) {
         row.data.push_back(Cell{}); //add null value in column of existing rows
@@ -27,6 +28,7 @@ void Table::createColumn(const std::string &col_name, const TypeTag type){
 };
 
 void Table::insertRow(std::vector<Cell> data){
+    std::unique_lock lock(rw_lock);
     auto error = validateRow(data);
 
     if(error.has_value())
@@ -42,6 +44,7 @@ void Table::insertRow(std::vector<Cell> data){
 }
 
 void Table::removeColumn(const std::string &col_name){
+    std::unique_lock lock(rw_lock);
     if(!col_name_to_index.count(col_name))
         throw std::invalid_argument("This column does not exist!");
 
@@ -61,6 +64,7 @@ void Table::removeColumn(const std::string &col_name){
 }
 
 void Table::deleteRow(const size_t id){
+    std::unique_lock lock(rw_lock);
     if(id >= last_row_id || rows.at(id).is_dead) 
         throw std::invalid_argument("This ID does not exist!");
 
@@ -70,6 +74,7 @@ void Table::deleteRow(const size_t id){
 }
 
 void Table::updateRow(const size_t id, std::vector<Cell> new_data){
+    std::unique_lock lock(rw_lock);
     if(id >= last_row_id || rows.at(id).is_dead)
         throw std::invalid_argument("This ID does not exist!");
 
@@ -82,6 +87,7 @@ void Table::updateRow(const size_t id, std::vector<Cell> new_data){
 }
 
 const Row& Table::getRow(const size_t id) const{
+    std::shared_lock lock(rw_lock);
     if(id >= last_row_id || rows.at(id).is_dead)
         throw std::invalid_argument("This ID does not exist!");
 
@@ -89,8 +95,19 @@ const Row& Table::getRow(const size_t id) const{
 }
 
 Row& Table::getRowMutable(const size_t id){
+    std::shared_lock lock(rw_lock);
     if(id >= last_row_id || rows.at(id).is_dead)
         throw std::invalid_argument("This ID does not exist!");
 
     return rows.at(id);
+}
+
+const std::vector<Row>& Table::getAllRows() const{
+    std::shared_lock lock(rw_lock);
+    return rows;
+}
+
+const std::vector<Column>& Table::getCols() const {
+    std::shared_lock lock(rw_lock);
+    return cols;
 }

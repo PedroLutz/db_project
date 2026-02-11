@@ -8,6 +8,8 @@
 #include <exception>
 #include <queue>
 #include <optional>
+#include <shared_mutex>
+#include <mutex>
 
 using Cell = std::variant<std::monostate, int, float, bool, std::string>;
 
@@ -33,6 +35,8 @@ class Table {
         std::queue<size_t> free_ids;
         size_t last_row_id = 0;
 
+        mutable std::shared_mutex rw_lock;
+
         using ValidationResult = std::optional<std::string>;
         ValidationResult validateRow (const std::vector<Cell>& data) const;
 
@@ -40,7 +44,7 @@ class Table {
         Table(std::string n) : name(n) {};
         ~Table() = default;
 
-        void createColumn(const std::string &col_name, const TypeTag type);
+        void createColumn(const Column& column);
         void insertRow(std::vector<Cell> data);
         
         void removeColumn(const std::string &col_name);
@@ -49,6 +53,9 @@ class Table {
         void updateRow(const size_t id, std::vector<Cell> new_data);
         const Row& getRow(const size_t id) const;
         Row& getRowMutable(const size_t id);
+
+        const std::vector<Row>& getAllRows() const;
+        const std::vector<Column>& getCols() const;
 };
 
 #endif
