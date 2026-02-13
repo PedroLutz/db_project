@@ -26,14 +26,14 @@ class TableManager {
         void createColumnInTable(const std::string& table_name, const Column& column);
         void insertRowInTable(const std::string& table_name, std::vector<Cell> data);
         
-        void removeColumnInTable(const std::string& table_name, const std::string &col_name);
+        void dropColumnInTable(const std::string& table_name, const std::string &col_name);
         void deleteRowInTable(const std::string& table_name, const size_t id);
 
         void updateRowInTable(const std::string& table_name, const size_t id, std::vector<Cell> new_data);
         const Row& getRowInTable(const std::string& table_name, const size_t id) const;
         Row& getRowMutableInTable(const std::string& table_name, const size_t id);
 
-        const std::vector<Row>& getAllRowsInTable(const std::string& table_name) const;
+        const std::vector<const Row*> getAllRowsInTable(const std::string& table_name) const;
         const std::vector<Column>& getColsInTable(const std::string& table_name) const;
 };
 

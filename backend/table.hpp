@@ -26,6 +26,14 @@ struct Row {
     bool is_dead = true;
 };
 
+inline const std::unordered_map<std::string, TypeTag> typeStringToTypeTag{
+    {"null", TypeTag::NULL_TYPE},
+    {"int", TypeTag::INT},
+    {"float", TypeTag::FLOAT},
+    {"bool", TypeTag::BOOL},
+    {"string", TypeTag::STRING},
+};
+
 class Table {
     private:
         std::string name;
@@ -54,7 +62,7 @@ class Table {
         const Row& getRow(const size_t id) const;
         Row& getRowMutable(const size_t id);
 
-        const std::vector<Row>& getAllRows() const;
+        const std::vector<const Row*> getAllRows() const;
         const std::vector<Column>& getCols() const;
 };
 

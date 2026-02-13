@@ -1,0 +1,56 @@
+{
+    "action": "fetch_all"
+    "table": [table_name]
+}
+
+{
+    "action": "fetch_id"
+    "table": [table_name],
+    "id": [id]
+}
+
+{
+    "action": "insert_row"
+    "table": [table_name],
+    "data": [
+        [cells]
+    ]
+}
+
+{
+    "action": "insert_column"
+    "table": [table_name],
+    "name": [name],
+    "type": [type]
+}
+
+{
+    "action": "create_table"
+    "table": [table_name],
+}
+
+{
+    "action": "delete_row",
+    "table": [table_name],
+    "id": [id]
+}
+
+{
+    "action": "drop_column",
+    "table": [table_name],
+    "name": [name]
+}
+
+{
+    "action": "drop_table",
+    "table": [table_name]
+}
+
+{
+    "action": "update_row",
+    "table": [table_name],
+    "id": [id],
+    "data": [
+        [array of cells]
+    ]
+}

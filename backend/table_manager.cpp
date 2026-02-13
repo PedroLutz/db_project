@@ -47,7 +47,7 @@ void TableManager::insertRowInTable(const std::string& table_name, std::vector<C
     table.insertRow(std::move(data));
 }
 
-void TableManager::removeColumnInTable(const std::string& table_name, const std::string &col_name){
+void TableManager::dropColumnInTable(const std::string& table_name, const std::string &col_name){
     std::shared_lock lock(map_lock);
     Table& table = getTableOrThrow(table_name);
     table.removeColumn(col_name);
@@ -77,7 +77,7 @@ Row& TableManager::getRowMutableInTable(const std::string& table_name, const siz
     return table.getRowMutable(id);
 }
 
-const std::vector<Row>& TableManager::getAllRowsInTable(const std::string& table_name) const {
+const std::vector<const Row*> TableManager::getAllRowsInTable(const std::string& table_name) const {
     std::shared_lock lock(map_lock);
     const Table& table = getTableOrThrow(table_name);
     return table.getAllRows();

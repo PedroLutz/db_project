@@ -102,9 +102,19 @@ Row& Table::getRowMutable(const size_t id){
     return rows.at(id);
 }
 
-const std::vector<Row>& Table::getAllRows() const{
+const std::vector<const Row*> Table::getAllRows() const{
     std::shared_lock lock(rw_lock);
-    return rows;
+    std::vector<const Row*> result;
+
+    result.reserve(rows.size());
+
+    for(const auto& row : rows){
+        if(!row.is_dead){
+            result.push_back(&row);
+        }
+    }
+
+    return result;
 }
 
 const std::vector<Column>& Table::getCols() const {
