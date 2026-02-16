@@ -20,6 +20,8 @@ class TableManager {
     public:
         TableManager() = default;
 
+        std::vector<std::string> getTableNames() const;
+
         void createTable(const std::string& table_name);
         void dropTable(const std::string& table_name);
 

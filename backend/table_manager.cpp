@@ -1,5 +1,13 @@
 #include "table_manager.hpp"
 
+std::vector<std::string> TableManager::getTableNames() const{
+    std::vector<std::string> v;
+    for(const auto& pair : tables ){
+        v.push_back(pair.first);
+    }
+    return v;
+}
+
 Table& TableManager::getTableOrThrow(const std::string& table_name){
     auto it = tables.find(table_name);
 

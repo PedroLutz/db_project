@@ -34,6 +34,14 @@ inline const std::unordered_map<std::string, TypeTag> typeStringToTypeTag{
     {"string", TypeTag::STRING},
 };
 
+inline const std::unordered_map<TypeTag, std::string> typeTagtoTypeString{
+    {TypeTag::NULL_TYPE, "null"},
+    {TypeTag::INT, "int"},
+    {TypeTag::FLOAT, "float"},
+    {TypeTag::BOOL, "bool"},
+    {TypeTag::STRING, "string"}
+};
+
 class Table {
     private:
         std::string name;

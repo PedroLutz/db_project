@@ -1,44 +1,11 @@
 #include "request_manager.hpp"
 
-static json cellToJson(const Cell& cell){
-    return std::visit([](auto&& arg) -> json {
-        using T = std::decay_t<decltype(arg)>;
-        if constexpr (std::is_same_v<T, std::monostate){
-            return nullptr;
-        } else {
-            return arg;
-        }
-    }, cell);
-}
-
-static json rowToJson(const Row& row){
-    json j;
-    j["id"] = row.id;
-    j["data"] = json::array();
-
-    for(const auto& cell : row.data){
-        j["data"].push_back(cellToJson(cell));
-    }
-
-    return j;
-}
-
-static Cell jsonToCell(const json& j){
-    if(j.is_null()) return std::monostate{};
-    else if (j.is_number_integer()) return j.get<int>();
-    else if (j.is_number_float()) return j.get<float>();
-    else if (j.is_boolean()) return j.get<bool>();
-    else if (j.is_string()) return j.get<std::string>();
-
-    throw std::invalid_argument("JSON data type not supported!");
-}
-
 std::string RequestManager::handleRequest(const std::string& request){
     auto j = json::parse(request);
     std::string action = j["action"];
 
-    static const std::unordered_map<std::string, std::function<json(const json&, TableManager&)>> handlers {
-        {"fetch_all", [](const json& req, TableManager& db){
+    static const std::unordered_map<std::string, std::function<json(const json&, TableManager&, FileManager&)>> handlers {
+        {"fetch_all", [](const json& req, TableManager& db, FileManager &fm){
             std::vector<const Row*> rows = db.getAllRowsInTable(req["table"].get<std::string>());
             json result = json::array();
             for(const Row* row : rows){
@@ -47,66 +14,68 @@ std::string RequestManager::handleRequest(const std::string& request){
             return result;
         }},
 
-        {"fetch_id", [](const json& req, TableManager& db){
+        {"fetch_id", [](const json& req, TableManager& db, FileManager &fm){
             const Row& row = db.getRowInTable(req["table"].get<std::string>(), req["id"].get<int>());
             json result = rowToJson(row);
             return result;
         }},
 
-        {"insert_row", [](const json& req, TableManager& db){
+        {"insert_row", [](const json& req, TableManager& db, FileManager &fm){
             std::vector<Cell> row;
             for(auto& element : req["data"])
                 row.push_back(jsonToCell(element));
             
             db.insertRowInTable(req["table"].get<std::string>(), std::move(row));
+            fm.notifyChange();
             return "Row inserted successfully";
         }},
 
-        {"insert_column", [](const json& req, TableManager& db){
+        {"insert_column", [](const json& req, TableManager& db, FileManager &fm){
             Column col = {req["name"], typeStringToTypeTag.at(req["type"])};
             db.createColumnInTable(req["table"].get<std::string>(), std::move(col));
+            fm.notifyChange();
             return "Column created successfully";
         }},
 
-        {"create_table", [](const json& req, TableManager& db){
+        {"create_table", [](const json& req, TableManager& db, FileManager &fm){
             db.createTable(req["table"].get<std::string>());
+            fm.notifyChange();
             return "Table created successfully";
         }},
 
         
-        {"delete_row", [](const json& req, TableManager& db){
+        {"delete_row", [](const json& req, TableManager& db, FileManager &fm){
             db.deleteRowInTable(req["table"].get<std::string>(), req["id"].get<int>());
+            fm.notifyChange();
             return "Row deleted successfully";
         }},
 
-        {"drop_column", [](const json& req, TableManager& db){
+        {"drop_column", [](const json& req, TableManager& db, FileManager &fm){
             db.dropColumnInTable(req["table"].get<std::string>(), req["name"].get<std::string>());
+            fm.notifyChange();
             return "Column dropped successfully";
         }},
 
-        {"drop_table", [](const json& req, TableManager& db){
+        {"drop_table", [](const json& req, TableManager& db, FileManager &fm){
             db.dropTable(req["table"].get<std::string>());
+            fm.notifyChange();
             return "Table dropped successfully";
         }},
 
-        {"update_row", [](const json& req, TableManager& db){
+        {"update_row", [](const json& req, TableManager& db, FileManager &fm){
             std::vector<Cell> row;
             for(auto& element : req["data"])
                 row.push_back(jsonToCell(element));
             
             db.updateRowInTable(req["table"].get<std::string>(), req["id"].get<int>(), std::move(row));
-            return "Row updated successfully";
-        }},
-
-        {"update_column", [](const json& req, TableManager& db){
-            
+            fm.notifyChange();
             return "Row updated successfully";
         }},
     };
 
     try {
         if(handlers.count(action)){
-            json result = handlers.at(action)(j, db);
+            json result = handlers.at(action)(j, db, fm);
 
             return json{
                 {"status", "success"},
