@@ -10,6 +10,11 @@
 }
 
 {
+    "action": "fetch_table"
+    "table": [table_name]
+}
+
+{
     "action": "insert_row"
     "table": [table_name],
     "data": [

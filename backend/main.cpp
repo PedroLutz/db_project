@@ -16,6 +16,23 @@ int main(void)
 
     crow::SimpleApp app;
 
+    CROW_ROUTE(app, "/tables")
+        .methods(crow::HTTPMethod::GET)
+        ([&req_manager](){
+            std::string json_request = "{\"action\": \"fetch_all_tables\"}";
+            std::string response = req_manager.handleRequest(json_request);
+
+            crow::response res;
+            res.code = 200;
+            res.set_header("Access-Control-Allow-Origin", "*"); 
+            res.set_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+            res.set_header("Access-Control-Allow-Headers", "Content-Type");
+            res.set_header("Content-Type", "application/json");
+            res.body = response; 
+
+            return res;
+        });
+
     CROW_ROUTE(app, "/query")
         .methods(crow::HTTPMethod::POST)
         ([&req_manager](const crow::request &req){
@@ -23,6 +40,9 @@ int main(void)
 
             crow::response res;
             res.code = 200;
+            res.set_header("Access-Control-Allow-Origin", "*"); 
+            res.set_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+            res.set_header("Access-Control-Allow-Headers", "Content-Type");
             res.set_header("Content-Type", "application/json");
             res.body = response; 
 

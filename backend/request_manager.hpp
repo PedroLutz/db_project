@@ -2,9 +2,10 @@
 #define REQUEST_MANAGER_HPP
 
 #include "table_manager.hpp"
-#include "file_manager.hpp"
 #include <functional>
 #include "json_handlers.hpp"
+
+class FileManager;
 
 class RequestManager {
     private:

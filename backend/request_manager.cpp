@@ -1,10 +1,20 @@
 #include "request_manager.hpp"
+#include "file_manager.hpp"
 
 std::string RequestManager::handleRequest(const std::string& request){
     auto j = json::parse(request);
     std::string action = j["action"];
 
     static const std::unordered_map<std::string, std::function<json(const json&, TableManager&, FileManager&)>> handlers {
+        {"fetch_all_tables", [](const json& req, TableManager& db, FileManager &fm){
+            json result = json::array();
+            const std::vector<std::string> tables = db.getTableNames();
+            for(const std::string& table : tables){
+                result.push_back(table);
+            }
+            return result;
+        }},
+        
         {"fetch_all", [](const json& req, TableManager& db, FileManager &fm){
             std::vector<const Row*> rows = db.getAllRowsInTable(req["table"].get<std::string>());
             json result = json::array();
@@ -17,6 +27,31 @@ std::string RequestManager::handleRequest(const std::string& request){
         {"fetch_id", [](const json& req, TableManager& db, FileManager &fm){
             const Row& row = db.getRowInTable(req["table"].get<std::string>(), req["id"].get<int>());
             json result = rowToJson(row);
+            return result;
+        }},
+
+        {"fetch_table", [](const json& req, TableManager& db, FileManager &fm){
+            std::string table_name = req["table"].get<std::string>();
+            
+            std::vector<const Row*> rows = db.getAllRowsInTable(table_name);
+            std::vector<Column> cols = db.getColsInTable(table_name);
+            json result;
+            
+            result["table"] = table_name;
+            
+            result["cols"] = json::array();
+            for(const Column& col : cols){
+                json col_json;
+                col_json["name"] = col.name;
+                col_json["type"] = typeTagtoTypeString.at(col.type);
+                result["cols"].push_back(col_json);
+            }
+            
+            result["rows"] = json::array();
+            for(const Row* row : rows){
+                result["rows"].push_back(rowToJson(*row));
+            }
+            
             return result;
         }},
 
