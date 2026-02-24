@@ -1,19 +1,25 @@
+export const Action = {
+    CREATE: "create_table",
+    DROP: "drop_table"
+} as const;
+
 export const getTableNames = async () => {
     const response = await fetch("http://localhost:8080/tables");
     const data = await response.json();
-    if(data.code !== 200) throw new Error("Error while fetching tables");
-    return data.body;
+    if(data.status !== "success") throw new Error("Error while fetching tables");
+    return data.result;
 }
 
-export const submitNewTable = async (tableName: string) => {
+export const submitTableAction = async (tableName: string, action: string) => {
     const dataPackage = {
-        action: "create_table",
+        action: action,
         table: tableName
     }
 
     const response = await fetch("http://localhost:8080/query", 
         {
             method: "POST",
+            mode: "cors",
             headers: {
                 'Content-Type': 'application/json' 
             },

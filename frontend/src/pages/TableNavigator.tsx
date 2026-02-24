@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getTableNames, submitNewTable } from "../api/tables";
+import { Action, getTableNames, submitTableAction } from "../api/tableNavigator";
 
 const TableNavigator = () => {
     const [tables, setTables] = useState<string[]>([]);
@@ -10,7 +10,6 @@ const TableNavigator = () => {
 
     const fetchTables = async () => {
             const tables = await getTableNames();
-            console.log(tables)
             setTables(tables);
         };
 
@@ -18,9 +17,9 @@ const TableNavigator = () => {
         fetchTables();
     }, []);
 
-    const handleSubmit = async () => {
-        submitNewTable(newTable);
-        fetchTables();
+    const handleAction = async (table: string, action: string) =>{
+        await submitTableAction(table, action);
+        await fetchTables();
     }
 
     return (
@@ -28,9 +27,12 @@ const TableNavigator = () => {
             {tables.map((table, index) => (
                 <div key={index}
                     className="table_container"
-                    onClick={() => navigate(`/${table}`)}
                 >
                     {table}
+                    <div>
+                        <button onClick={() => navigate(`/${table}`)}>Access</button>
+                        <button onClick={() => handleAction(table, Action.DROP)}>Drop</button>
+                    </div>
                 </div>
             ))}
             <div className="table_container">
@@ -41,7 +43,7 @@ const TableNavigator = () => {
                         setNewTable(e.target.value)}
                     placeholder="Table name"
                 />
-                <button onClick={handleSubmit}>Add new table</button>
+                <button onClick={() => handleAction(newTable, Action.CREATE)}>Add new table</button>
             </div>
         </div>
     )

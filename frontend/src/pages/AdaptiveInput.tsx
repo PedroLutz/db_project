@@ -3,7 +3,7 @@ import { Type } from "../utils/TypeObject";
 
 export interface AdaptiveInputProps {
     name: string;
-    type: number;
+    type: string;
     value: any;
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
     placeholder: string | undefined;
