@@ -19,7 +19,7 @@ const AdaptiveInput = ({name, type, value, onChange, placeholder} : AdaptiveInpu
         return (
             <select
                 name={name}
-                value={value}
+                value={value ?? ""}
                 onChange={onChange}
             >
                 <option defaultValue="">{placeholder}</option>
@@ -32,7 +32,7 @@ const AdaptiveInput = ({name, type, value, onChange, placeholder} : AdaptiveInpu
         return (
             <input
                 name={name}
-                value={value}
+                value={value ?? 0}
                 onChange={intChangeHandler}
                 placeholder={placeholder}
                 type="number"
@@ -43,7 +43,7 @@ const AdaptiveInput = ({name, type, value, onChange, placeholder} : AdaptiveInpu
         return (
             <input
                 name={name}
-                value={value}
+                value={value ?? 0}
                 onChange={onChange}
                 placeholder={placeholder}
                 type="number"
@@ -54,7 +54,7 @@ const AdaptiveInput = ({name, type, value, onChange, placeholder} : AdaptiveInpu
         return (
             <input
                 name={name}
-                value={value}
+                value={value ?? ""}
                 onChange={onChange}
                 placeholder={placeholder}
                 type="text"

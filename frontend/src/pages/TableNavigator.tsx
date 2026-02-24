@@ -1,23 +1,23 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, type NavigateFunction } from "react-router-dom";
 import { Action, getTableNames, submitTableAction } from "../api/tableNavigator";
 
 const TableNavigator = () => {
     const [tables, setTables] = useState<string[]>([]);
     const [newTable, setNewTable] = useState<string>("");
 
-    const navigate = useNavigate();
+    const navigate: NavigateFunction = useNavigate();
 
-    const fetchTables = async () => {
-            const tables = await getTableNames();
-            setTables(tables);
-        };
+    const fetchTables = async () : Promise<void> => {
+        const tables = await getTableNames();
+        setTables(tables);
+    };
 
     useEffect(() => {
         fetchTables();
     }, []);
 
-    const handleAction = async (table: string, action: string) =>{
+    const handleAction = async (table: string, action: string) => {
         await submitTableAction(table, action);
         await fetchTables();
     }
