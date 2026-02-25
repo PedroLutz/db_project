@@ -1,6 +1,6 @@
-#include "crow_all.h" // O CORSHandler já vem embutido aqui nas versões modernas
-#include "request_manager.hpp"
-#include "file_manager.hpp"
+#include "crow_all.h"
+#include "./api/request_manager.hpp"
+#include "./storage/file_manager.hpp"
 
 int main(void)
 {

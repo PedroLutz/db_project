@@ -2,7 +2,7 @@
 #define JSON_HANDLERS_HPP
 
 #include <nlohmann/json.hpp>
-#include "table.hpp"
+#include "../core/table.hpp"
 
 using json = nlohmann::json;
 

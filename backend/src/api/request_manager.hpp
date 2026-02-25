@@ -1,9 +1,9 @@
 #ifndef REQUEST_MANAGER_HPP
 #define REQUEST_MANAGER_HPP
 
-#include "table_manager.hpp"
+#include "../core/table_manager.hpp"
 #include <functional>
-#include "json_handlers.hpp"
+#include "../utils/json_handlers.hpp"
 
 class FileManager;
 

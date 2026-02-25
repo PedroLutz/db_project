@@ -1,4 +1,4 @@
-#include "file_manager.hpp"\
+#include "file_manager.hpp"
 
 FileManager::FileManager(TableManager &d) : db(d) {
     persistence_thread = std::thread([this]() {
@@ -36,7 +36,7 @@ FileManager::~FileManager(){
 }
 
 void FileManager::saveDataToFile(){
-    std::fstream file("reconstruction_logs.bin", std::ios::out | std::ios::trunc | std::ios::binary);
+    std::fstream file("db.bin", std::ios::out | std::ios::trunc | std::ios::binary);
 
     if(!file){
         std::cerr << "Error while opening file!";
@@ -90,7 +90,7 @@ void FileManager::saveDataToFile(){
 std::vector<std::string> FileManager::loadFileData(){
     std::vector<std::string> logs;
 
-    std::fstream file("reconstruction_logs.bin", std::ios::in | std::ios::binary);
+    std::fstream file("db.bin", std::ios::in | std::ios::binary);
 
     if(!file.is_open()){
         return logs;

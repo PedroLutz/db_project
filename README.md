@@ -36,8 +36,8 @@ Update the `#include` clauses to fit your situation.<br><br>
 
 ```bash
 cd backend
-g++ *.cpp -o db -std=c++17 -lpthread
-./db
+make
+./bin/db
 ```
 
 ### Frontend
