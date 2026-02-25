@@ -8,7 +8,7 @@ const TableNavigator = () => {
 
     const navigate: NavigateFunction = useNavigate();
 
-    const fetchTables = async () : Promise<void> => {
+    const fetchTables = async (): Promise<void> => {
         const tables = await getTableNames();
         setTables(tables);
     };
@@ -17,33 +17,61 @@ const TableNavigator = () => {
         fetchTables();
     }, []);
 
-    const handleAction = async (table: string, action: string) => {
-        await submitTableAction(table, action);
+    const handleDrop = async (table: string): Promise<void> => {
+        let droppingConfirmation = confirm("Are you sure you want to drop the table?");
+
+        if (!droppingConfirmation)
+            return;
+
+        const response = await submitTableAction(table, Action.DROP);
+         if(response.status !== "success"){
+            alert("Error: " + response.message);
+            console.error("Error: " + response.message);
+            return;
+        }
+        
         await fetchTables();
+    }
+
+    const handleCreate = async (table: string): Promise<void> => {
+        const response = await submitTableAction(table, Action.CREATE);
+        if(response.status !== "success"){
+            alert("Error: " + response.message);
+            console.error("Error: " + response.message);
+            return;
+        }
+            
+        await fetchTables();
+        setNewTable("");
     }
 
     return (
         <div className="main">
-            {tables.map((table, index) => (
-                <div key={index}
-                    className="table_container"
-                >
-                    {table}
-                    <div>
-                        <button onClick={() => navigate(`/${table}`)}>Access</button>
-                        <button onClick={() => handleAction(table, Action.DROP)}>Drop</button>
+            <div className="table_nav_container">
+                <div className="table_nav_table_wrapper table_nav_new_table">
+                    <div className="table_nav_table_name">New table</div>
+                    <div className="table_nav_table_inputs">
+                        <input
+                            name="table"
+                            value={newTable}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                setNewTable(e.target.value)}
+                            placeholder="Table name"
+                        />
+                        <button onClick={() => handleCreate(newTable)}>Add new table</button>
                     </div>
+
                 </div>
-            ))}
-            <div className="table_container">
-                <input
-                    name="table"
-                    value={newTable}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-                        setNewTable(e.target.value)}
-                    placeholder="Table name"
-                />
-                <button onClick={() => handleAction(newTable, Action.CREATE)}>Add new table</button>
+                {tables.map((table, index) => (
+                    <div key={index} className="table_nav_table_wrapper">
+                        <div className="table_nav_table_name">{table}</div>
+
+                        <div className="table_nav_table_inputs">
+                            <button onClick={() => navigate(`/${table}`)}>Access</button>
+                            <button onClick={() => handleDrop(table)}>Drop</button>
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     )
